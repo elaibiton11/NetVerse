@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>כניסה</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container py-5" style="max-width:480px;">
+    <h1 class="h3 mb-3 text-center">כניסה</h1>  
+    <form id="loginForm" class="card card-body">
+      <div class="mb-3">
+        <label class="form-label">אימייל</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">סיסמה</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <button class="btn btn-primary w-100">כניסה</button>
+      <p class="text-center mt-3 mb-0"><a href="/register.html">אין משתמש? הרשמה</a></p>
+    </form>
+  </div>
+  <script src="/js/auth.js"></script>
+</body>
+</html>
