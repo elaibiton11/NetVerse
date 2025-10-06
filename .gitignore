@@ -26,3 +26,7 @@ __pycache__/
 # אל תעלה את השרת
 server/
 api/
+server.js
+seed.js
+seed_more.js
+migrate_profiles.js
