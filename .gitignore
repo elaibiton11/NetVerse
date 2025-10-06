@@ -1,0 +1,28 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+
+# Dependencies & builds
+node_modules/
+dist/
+build/
+.cache/
+.next/
+out/
+
+# Secrets
+.env
+*.key
+*.pem
+
+# Python (אם יש)
+venv/
+__pycache__/
+*.pyc
+
+# אל תעלה את השרת
+server/
+api/
