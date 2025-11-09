@@ -8,13 +8,22 @@
 </head>
   <body class="bg-dark text-white">
   <div class="container py-4">
-    <h1 class="h4 mb-3">Admin: הוספת כותרת</h1>
-    <form id="frm">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">שם</label>
-          <input class="form-control" id="name" required>
-        </div>
+  <h1 class="h4 mb-3">Admin: הוספת כותרת</h1>
+   <form id="frm">
+    <div class="row g-3">
+     <div class="col-md-6">
+     <label class="form-label">שם התוכן</label>
+     <input class="form-control" id="name" required>
+   </div>
+  <div class="col-md-3">
+    <label class="form-label">סוג</label>
+     <!-- במקום input חופשי: select סגור -->
+     <select class="form-select" id="kind" required>
+     <option value="movie" selected>סרט</option>
+     <option value="series">סדרה</option>
+     </select>
+   </div>
+
 </body>
 </html>
 
