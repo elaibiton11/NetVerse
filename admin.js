@@ -19,3 +19,18 @@ async function ensureAdmin() {
   }
   return user;
 }
+async function uploadToGridFS(kind, file) {
+  if (!file) return null;
+  const contentType = file.type || (kind === 'image' ? 'image/jpeg' : 'video/mp4');
+  const filename = encodeURIComponent(file.name || (kind + Date.now()));
+  const buf = await file.arrayBuffer();
+  const r = await fetch(`/api/upload/${kind}?filename=${filename}&contentType=${encodeURIComponent(contentType)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/octet-stream' },
+    body: buf
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Upload failed');
+  return data.fileId;
+}
+
