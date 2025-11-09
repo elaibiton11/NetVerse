@@ -35,8 +35,32 @@
    <label class="form-label">ז׳אנרים (מופרדים בפסיק)</label>
    <input class="form-control" id="genres" placeholder="Action, Comedy">
  </div>
-
-
+<div class="col-md-6">
+   <label class="form-label">תמונה (Poster)</label>
+   <input class="form-control" id="poster" type="file" accept="image/*">
+</div>
+<div class="col-md-6">
+  <label class="form-label">וידאו (MP4 מומלץ)</label>
+  <input class="form-control" id="video" type="file" required accept="video/*">
+</div>
+    </div>
+<!-- רק לסדרה -->
+    <div id="seriesFields" class="row g-3 mt-3 d-none">
+    <div class="col-md-6">
+     <label class="form-label">מזהה סדרה (seriesId)</label>
+     <input class="form-control" id="seriesId" placeholder="למשל: city_life">
+     <div class="form-text text-secondary">
+            בכל פרק של אותה סדרה אותו מזהה.
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">מספר פרק (episodeIndex)</label>
+          <input class="form-control" id="episodeIndex" type="number" min="1" step="1">
+          <div class="form-text text-secondary">
+            1 לפרק ראשון, 2 לשני וכו'.
+          </div>
+        </div>
+      </div>
 </body>
 </html>
 
