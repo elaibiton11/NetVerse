@@ -92,10 +92,87 @@ async function renderDailyViewsChart() {
     });
   }
 
-  new Chart(ctx, {
+ new Chart(ctx, {
     type: "bar",
     data: {
       labels: days,
       datasets,
     },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+
+// --- גרף עוגה: פופולריות תכנים לפי ז׳אנר ---
+async function renderGenrePieChart() {
+  const ctx = document.getElementById("genrePieChart");
+  if (!ctx) return;
+
+  const r = await fetch("/api/stats/genres", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!r.ok) return;
+  const { items } = await r.json(); // [{ genre, views }, ...]
+
+  if (!items || !items.length) return;
+
+  const labels = items.map((it) => it.genre || "לא ידוע");
+  const data = items.map((it) => it.views || 0);
+
+  const colors = [
+    "#ff6384",
+    "#36a2eb",
+    "#ffcd56",
+    "#4bc0c0",
+    "#9966ff",
+    "#ff9f40",
+    "#8bc34a",
+    "#e91e63",
+    "#607d8b",
+    "#cddc39",
+  ];
+
+  new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: colors.slice(0, labels.length),
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "bottom",
+        },
+      },
+    },
+  });
+}
+
+
 
