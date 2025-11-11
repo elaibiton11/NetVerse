@@ -33,4 +33,7 @@ async function uploadToGridFS(kind, file) {
   if (!r.ok) throw new Error(data.error || 'Upload failed');
   return data.fileId;
 }
+// ברגע שבוחרים סדרה ולא סרט יאפשר לראות פרטים נוספים על הסדרה
+kindEl.addEventListener('change', updateSeriesFieldsVisibility);
+updateSeriesFieldsVisibility();
 
