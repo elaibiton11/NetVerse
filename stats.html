@@ -14,5 +14,30 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
       </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto" id="authLinks">
+          <li class="nav-item"><a class="nav-link" href="/login.html">כניסה</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register.html">הרשמה</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+<main class="container py-4">
+    <h1 class="h4 mb-4 text-center">סטטיסטיקות צפייה</h1>
+ <div class="row g-4">
+ <div class="col-12 col-lg-7">
+ <div class="card bg-secondary bg-opacity-10 border-secondary h-100">
+ <div class="card-header border-secondary text-white">
+  <strong>צפיות יומיות לכל פרופיל</strong>
+ </div>
+ <div class="card-body">
+<canvas id="dailyViewsChart"></canvas>
+<div class="small text-light mt-2">
+  כל עמודה מייצגת כמות צפיות ליום, כאשר הצבעים השונים מייצגים פרופילים שונים.
+</div>
+ </div>
+ </div>
+ </div>
+
 
 
