@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NetVerse – סטטיסטיקות</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+  <body class="bg-dark text-white">
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-secondary">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/app">🍿 NETVERSE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav ms-auto" id="authLinks">
+            <li class="nav-item"><a class="nav-link" href="/login.html">כניסה</a></li>
+            <li class="nav-item"><a class="nav-link" href="/register.html">הרשמה</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="container py-4">
+      <h1 class="h4 mb-4 text-center">סטטיסטיקות צפייה</h1>
+      <div class="row g-4">
+        <div class="col-12 col-lg-7">
+          <div class="card bg-secondary bg-opacity-10 border-secondary h-100">
+            <div class="card-header border-secondary text-white">
+              <strong>צפיות יומיות לכל פרופיל</strong>
+            </div>
+            <div class="card-body">
+              <canvas id="dailyViewsChart"></canvas>
+              <div class="small text-light mt-2">
+                כל עמודה מייצגת כמות צפיות ליום, כאשר הצבעים השונים מייצגים פרופילים שונים.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-5">
+          <div class="card bg-secondary bg-opacity-10 border-secondary h-100">
+            <div class="card-header border-secondary text-white">
+              <strong>פופולריות תכנים לפי ז׳אנר</strong>
+            </div>
+            <div class="card-body">
+              <canvas id="genrePieChart"></canvas>
+              <div class="small text-light mt-2">
+                חלוקת צפיות לפי ז'אנרים
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/stats.js"></script>
+  </body>
+</html>
+
+
+
+
