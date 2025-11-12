@@ -33,6 +33,20 @@ async function uploadToGridFS(kind, file) {
   if (!r.ok) throw new Error(data.error || 'Upload failed');
   return data.fileId;
 }
+const kindEl = document.getElementById('kind');
+const seriesIdEl = document.getElementById('seriesId');
+const episodeIndexEl = document.getElementById('episodeIndex');
+const seriesFields = document.getElementById('seriesFields');
+
+// הצגת/הסתרת שדות של סדרה:
+function updateSeriesFieldsVisibility() {
+  const isSeries = (kindEl.value === 'series');
+  seriesFields.classList.toggle('d-none', !isSeries);
+}
+
+// חיבור האירועים:
+kindEl.addEventListener('change', updateSeriesFieldsVisibility);
+updateSeriesFieldsVisibility();
 // ברגע שבוחרים סדרה ולא סרט יאפשר לראות פרטים נוספים על הסדרה
 kindEl.addEventListener('change', updateSeriesFieldsVisibility);
 updateSeriesFieldsVisibility();
