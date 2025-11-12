@@ -14,4 +14,42 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
       </button>
+ <div class="collapse navbar-collapse" id="nav">
+        <form class="d-flex ms-auto" role="search" id="searchForm">
+          <input class="form-control me-2" type="search" placeholder="חיפוש" aria-label="Search" id="q">
+          <button class="btn btn-outline-light" type="submit">חפש</button>
+        </form>
+        <ul class="navbar-nav ms-3" id="authLinks">
+          <li class="nav-item"><a class="nav-link" href="/login.html">כניסה</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register.html">הרשמה</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h4 m-0">צפייה</h1>
+      <a class="btn btn-outline-light" href="/app">← חזרה לקטלוג</a>
+    </div>
+
+    <!-- אזור הנגן + כפתורי שליטה -->
+    <div class="row">
+      <div class="col-12">
+        <video id="player" class="w-100" controls playsinline preload="metadata" poster="/img/placeholder.jpg"></video>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div>
+            <div id="titleName" class="fw-bold"></div>
+            <div id="titleMeta" class="small text-secondary"></div>
+          </div>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Player controls">
+            <button type="button" class="btn btn-outline-light" id="btnBack10">⏪ 10- שנ'</button>
+            <button type="button" class="btn btn-outline-light" id="btnForward10">10+ שנ' ⏩</button>
+            <button type="button" class="btn btn-outline-light d-none" id="btnNextEp">פרק הבא ▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
