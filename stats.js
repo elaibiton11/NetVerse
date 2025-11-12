@@ -173,6 +173,13 @@ async function renderGenrePieChart() {
     },
   });
 }
-
+// --- init ---
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!await getMeStats()) return;
+  await Promise.all([
+    renderDailyViewsChart(),
+    renderGenrePieChart(),
+  ]);
+});
 
 
