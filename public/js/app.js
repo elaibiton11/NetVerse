@@ -55,7 +55,9 @@ function cardTile(t, opts = {}) {
     <div class="card-tile" data-id="${id}">
       <img src="${poster}" alt="${escapeAttr(t.name)}">
       <div class="d-flex justify-content-between align-items-center mt-2">
-        <div class="title text-truncate" title="${escapeAttr(t.name)}">${t.name}</div>
+         <div class="title text-truncate" title="${escapeAttr(t.name)}">
+       ${t.kind === 'series' ? escapeAttr(t.seriesId) : escapeAttr(t.name)}
+      </div>
         <div class="d-flex align-items-center gap-1">
           <button
             type="button"
