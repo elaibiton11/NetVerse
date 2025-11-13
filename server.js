@@ -400,8 +400,9 @@ app.post("/api/titles", requireAuth, requireAdmin, async (req, res) => {
     videoPath,
     posterFileId,
     videoFileId,
-    seriesId,      // NEW
-    episodeIndex,  // NEW
+    seriesId,     
+    episodeIndex,
+    actors
   } = req.body;
 
   if (!kind || !name) return res.status(400).json({ error: "Missing fields" });
@@ -430,6 +431,7 @@ app.post("/api/titles", requireAuth, requireAdmin, async (req, res) => {
       episodeIndex === ""
         ? null
         : Number(episodeIndex),
+    actors: Array.isArray(actors) ? actors : [], 
     createdAt: new Date(),
   };
 
