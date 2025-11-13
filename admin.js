@@ -33,6 +33,7 @@ async function uploadToGridFS(kind, file) {
   if (!r.ok) throw new Error(data.error || 'Upload failed');
   return data.fileId;
 }
+// אלמטים של סדרה
 const kindEl = document.getElementById('kind');
 const seriesIdEl = document.getElementById('seriesId');
 const episodeIndexEl = document.getElementById('episodeIndex');
@@ -44,9 +45,6 @@ function updateSeriesFieldsVisibility() {
   seriesFields.classList.toggle('d-none', !isSeries);
 }
 
-// חיבור האירועים:
-kindEl.addEventListener('change', updateSeriesFieldsVisibility);
-updateSeriesFieldsVisibility();
 // ברגע שבוחרים סדרה ולא סרט יאפשר לראות פרטים נוספים על הסדרה
 kindEl.addEventListener('change', updateSeriesFieldsVisibility);
 updateSeriesFieldsVisibility();
@@ -66,6 +64,14 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
+    const mainActorsRaw = document.getElementById('mainActors').value || '';
+    let actors = [];
+    if (mainActorsRaw.trim()) {
+      actors = mainActorsRaw
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);   
+    }
 
     const seriesId = seriesIdEl.value.trim();
     const episodeIndexRaw = episodeIndexEl.value.trim();
@@ -74,7 +80,7 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
     
     if (kind === 'series') {
       if (!seriesId) {
-        msg.textContent = 'חובה למלא סדרה (seriesId)".';
+        msg.textContent = 'חובה למלא סדרה (seriesId).';
         return;
       }
       if (!episodeIndex || Number.isNaN(episodeIndex) || episodeIndex < 1) {
@@ -84,8 +90,10 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
     }
     const posterFile = document.getElementById('poster').files[0];
     const videoFile  = document.getElementById('video').files[0];
+    
     const posterFileId = await uploadToGridFS('image', posterFile);
     const videoFileId  = await uploadToGridFS('video', videoFile);
+   
     const payload = {
       kind,
       name,
@@ -101,6 +109,11 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
       payload.seriesId = seriesId;
       payload.episodeIndex = episodeIndex;
     }
+
+    if (actors.length) {
+      payload.actors = actors; 
+    }
+
     await api('/api/titles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
