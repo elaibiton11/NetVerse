@@ -1,0 +1,183 @@
+async function getMeStats() {
+  const r = await fetch("/api/me", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  const data = await r.json();
+  const nav = document.getElementById("authLinks");
+  if (!data.user) {
+    // אם אין משתמש – חזרה למסך הבית/לוגין
+    window.location.href = "/";
+    return null;
+  }
+  const prof = data.selectedProfile
+    ? `👤 ${data.selectedProfile.name}`
+    : "בחר/י פרופיל";
+
+  nav.innerHTML =
+    '<li class="nav-item"><a class="nav-link" href="/profiles">' +
+    prof +
+    '</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href="#" id="logout">יציאה</a></li>';
+
+  document.getElementById("logout").onclick = async () => {
+    await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+    window.location.href = "/";
+  };
+
+  if (!data.selectedProfile) {
+    window.location.href = "/profiles";
+    return null;
+  }
+
+  return data.user;
+}
+
+// --- גרף עמודות: צפיות יומיות לכל פרופיל ---
+async function renderDailyViewsChart() {
+  const ctx = document.getElementById("dailyViewsChart");
+  if (!ctx) return;
+
+  const r = await fetch("/api/stats/daily-views", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!r.ok) return;
+  const { items } = await r.json(); // [{ day, profileId, profileName, views }, ...]
+
+  if (!items || !items.length) return;
+
+  // רשימת ימים ייחודיים 
+  const daysSet = new Set(items.map((it) => it.day));
+  const days = Array.from(daysSet).sort(); // YYYY-MM-DD לפי סדר
+
+  // רשימת פרופילים ייחודיים
+  const profileMap = new Map();
+  for (const it of items) {
+    const key = String(it.profileId || "unknown");
+    if (!profileMap.has(key)) {
+      profileMap.set(key, it.profileName || "ללא שם");
+    }
+  }
+
+  // נתונים לכל פרופיל
+  const datasets = [];
+  const palette = [
+    "#ff6384",
+    "#36a2eb",
+    "#ffcd56",
+    "#4bc0c0",
+    "#9966ff",
+    "#ff9f40",
+    "#8bc34a",
+    "#e91e63",
+  ];
+
+  let colorIndex = 0;
+  for (const [profileId, profileName] of profileMap.entries()) {
+    const data = days.map((day) => {
+      const row = items.find((it) => it.day === day && String(it.profileId || "unknown") === profileId);
+      return row ? row.views : 0;
+    });
+    const color = palette[colorIndex % palette.length];
+    colorIndex++;
+
+    datasets.push({
+      label: profileName,
+      data,
+      backgroundColor: color,
+      stack: "views",
+    });
+  }
+
+ new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: days,
+      datasets,
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+
+// --- גרף עוגה: פופולריות תכנים לפי ז׳אנר ---
+async function renderGenrePieChart() {
+  const ctx = document.getElementById("genrePieChart");
+  if (!ctx) return;
+
+  const r = await fetch("/api/stats/genres", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!r.ok) return;
+  const { items } = await r.json(); // [{ genre, views }, ...]
+
+  if (!items || !items.length) return;
+
+  const labels = items.map((it) => it.genre || "לא ידוע");
+  const data = items.map((it) => it.views || 0);
+
+  const colors = [
+    "#ff6384",
+    "#36a2eb",
+    "#ffcd56",
+    "#4bc0c0",
+    "#9966ff",
+    "#ff9f40",
+    "#8bc34a",
+    "#e91e63",
+    "#607d8b",
+    "#cddc39",
+  ];
+
+  new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: colors.slice(0, labels.length),
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "bottom",
+        },
+      },
+    },
+  });
+}
+// --- init ---
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!await getMeStats()) return;
+  await Promise.all([
+    renderDailyViewsChart(),
+    renderGenrePieChart(),
+  ]);
+});
+
+
