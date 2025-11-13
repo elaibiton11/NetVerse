@@ -55,7 +55,9 @@ function cardTile(t, opts = {}) {
     <div class="card-tile" data-id="${id}">
       <img src="${poster}" alt="${escapeAttr(t.name)}">
       <div class="d-flex justify-content-between align-items-center mt-2">
-        <div class="title text-truncate" title="${escapeAttr(t.name)}">${t.name}</div>
+         <div class="title text-truncate" title="${escapeAttr(t.name)}">
+       ${t.kind === 'series' ? escapeAttr(t.seriesId) : escapeAttr(t.name)}
+      </div>
         <div class="d-flex align-items-center gap-1">
           <button
             type="button"
@@ -218,42 +220,62 @@ function renderNewest() {
   wireRowClicks(row);
 }
 
-// “מדפים לפי ז׳אנר” — רק תכנים בני יותר משעה, עם קיבוץ סדרות
+
+// מציג מדפים לפי ז'אנר, כולל תכנים חדשים (לא מסנן isNew)
 function renderGenreShelves() {
-  const host = document.getElementById('genreShelves'); if (!host) return;
-  const older = allTitles.filter(t => !isNew(t));
+  const host = document.getElementById('genreShelves');
+  if (!host) return;
 
-  const groupedTitles = groupSeries(older);
+  // ✅ שינוי חשוב: לא מסננים תכנים חדשים החוצה
+  const groupedTitles = groupSeries(allTitles);
 
+  // קיבוץ לפי ז'אנר
   const byGenre = new Map();
   for (const t of groupedTitles) {
     for (const g of (t.genres || [])) {
-      if (!g) continue;
-      const key = String(g).trim();
+      const key = String(g || '').trim();
+      if (!key) continue;
       if (!byGenre.has(key)) byGenre.set(key, []);
       byGenre.get(key).push(t);
     }
   }
 
-  const sections = [];
-  for (const [g, list] of byGenre.entries()) {
-    const top = list
-      .slice()
-      .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))
-      .slice(0, 15);
-    const tiles = top.map(t => cardTile(t)).join('');
-    sections.push(`
-      <section class="mt-3">
-        <h3 class="h6 text-white mb-2">${g}</h3>
-        <div id="row-genre-${slugify(g)}" class="d-flex gap-3 overflow-auto py-2">${tiles}</div>
+  // מיון ז'אנרים לפי ABC (או שנה/פופולריות—מה שמתאים לך)
+  const entries = Array.from(byGenre.entries())
+    .sort((a, b) => a[0].localeCompare(b[0], 'he'));
+
+  // כמה להציג בכל מדף (שנה בקלות אם תרצה)
+  const LIMIT_PER_SHELF = 10;
+
+  // בניית ה־HTML למדפים
+  host.innerHTML = entries.map(([genre, list]) => {
+    // אופציונלי: מיון תכנים בכל מדף מהחדש לישן
+    list.sort((a, b) => {
+      const da = new Date(a.createdAt || 0).getTime();
+      const db = new Date(b.createdAt || 0).getTime();
+      return db - da;
+    });
+
+    const limited = list.slice(0, LIMIT_PER_SHELF);
+
+    const row = limited.map(t => `
+      <div class="me-3">${cardTile(t)}</div>
+    `).join('');
+
+    return `
+      <section class="mt-4">
+        <h2 class="h5 text-white">${genre}</h2>
+        <div class="d-flex gap-3 overflow-auto py-2">
+          ${row || '<div class="text-muted">אין פריטים בז׳אנר זה</div>'}
+        </div>
       </section>
-    `);
-  }
-  host.innerHTML =
-    sections.join('') ||
-    '<div class="text-muted">אין תכנים להצגה לפי ז׳אנר</div>';
-  wireRowClicks(host);
+    `;
+  }).join('');
+
+  // לחצני כרטיסים
+  host.querySelectorAll('.d-flex').forEach(row => wireRowClicks(row));
 }
+
 
 // =======================
 // 3) Grouping series + grid
@@ -447,7 +469,7 @@ async function getMe() {
 nav.innerHTML =
   '<li class="nav-item"><a class="nav-link" href="/profiles">' + prof + '</a></li>' +
   '<li class="nav-item"><a class="nav-link" href="/stats.html">סטטיסטיקות</a></li>' +
-  '<li class="nav-item"><a class="nav-link" href="/admin.html">אדמין</a></li>' +
+  '<li class="nav-item"><a class="nav-link" href="/admin.html">ניהול</a></li>' +
   '<li class="nav-item"><a class="nav-link" href="#" id="logout">יציאה</a></li>';
   document.getElementById('logout').onclick = async () => {
     await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
