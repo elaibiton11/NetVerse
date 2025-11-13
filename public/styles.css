@@ -122,3 +122,177 @@ body {
   border-radius: .5rem;
   font-weight: 700;
 }
+/* קדימה או אחורה בצפייה */
+.player-wrap { position: relative; }
+
+.seek-zone {
+  position: absolute;
+  top: 0;
+  bottom: 60px;              /* משאיר מקום לכפתורי הווידאו בתחתית */
+  width: 50%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: default;           /* לא משנה את צורת הסמן */
+  outline: none;
+}
+
+.seek-zone.left  { left: 0; }
+.seek-zone.right { right: 0; }
+
+/* כשמתקרבים לתחתית – מבטלים קליקים על האזורים השקופים */
+.player-wrap.controls-hover .seek-zone {
+  pointer-events: none;
+}
+
+/* במובייל – רווח גדול יותר בתחתית */
+@media (pointer: coarse) {
+  .seek-zone { bottom: 84px; }
+}
+
+/* טוסט פידבק קצר במרכז */
+.seek-toast {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  padding: .35rem .6rem;
+  border-radius: .5rem;
+  font-size: clamp(16px, 2.8vw, 22px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .18s, transform .18s;
+}
+.seek-toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.04);
+}
+/* כפתורי "נטפליקס" במרכז למטה */
+.center-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 72px; /* מעל כפתורי הוידאו המובנים */
+  transform: translateX(-50%) translateY(8px);
+  display: flex;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none; /* ברירת מחדל – לא לוחיץ כשמוסתרים */
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 5;
+}
+
+.center-controls.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto; /* כשגלויים – אפשר ללחוץ */
+}
+
+.center-controls .ctrl-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.18); /* "חלבי" שקוף */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.center-controls .ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.30);
+}
+
+.center-controls .ctrl-btn:active {
+  transform: scale(0.94);
+}
+
+/* במובייל – קצת יותר גבוה */
+@media (pointer: coarse) {
+  .center-controls {
+    bottom: 96px;
+  }
+}
+/* מסתיר את כפתור המסך המלא המובנה של הווידאו – נשתמש בשלנו */
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+
+/* כפתור מסך מלא בפינה */
+.fs-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px; /* אם את רוצה בימין, תשני ל-right: 12px; ותורידי את left */
+  z-index: 6;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fs-btn:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+/* כאשר #playerWrap במסך מלא – תופס את כל הגובה */
+:fullscreen #playerWrap,
+#playerWrap:fullscreen {
+  width: 100vw;
+  height: 100vh;
+}
+/* מסך סיום צפייה מעל הנגן */
+.end-screen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.end-screen-inner {
+  text-align: center;
+  max-width: 420px;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(15,23,42,0.92);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.55);
+}
+
+.end-screen-inner h3 {
+  font-size: 1.4rem;
+}
+
+/* Bootstrap כבר נותן .d-none, אבל זה שיהיה ברור */
+.end-screen.d-none {
+  display: none;
+}
+/* גודל מסך צפיה */
+#playerWrap {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+#player {
+  width: 100%;
+  aspect-ratio: 16 / 10;  
+  object-fit: cover;
+  border-radius: 12px;
+}
+
