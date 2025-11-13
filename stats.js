@@ -18,8 +18,6 @@ async function getMeStats() {
     '<li class="nav-item"><a class="nav-link" href="/profiles">' +
     prof +
     '</a></li>' +
-    '<li class="nav-item"><a class="nav-link" href="/stats.html">סטטיסטיקות</a></li>' +
-    '<li class="nav-item"><a class="nav-link" href="/admin.html">אדמין</a></li>' +
     '<li class="nav-item"><a class="nav-link" href="#" id="logout">יציאה</a></li>';
 
   document.getElementById("logout").onclick = async () => {
