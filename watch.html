@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
+  
 <body class="bg-dark text-white">
   <nav class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-secondary">
     <div class="container-fluid">
@@ -19,10 +20,6 @@
           <input class="form-control me-2" type="search" placeholder="חיפוש" aria-label="Search" id="q">
           <button class="btn btn-outline-light" type="submit">חפש</button>
         </form>
-        <ul class="navbar-nav ms-3" id="authLinks">
-          <li class="nav-item"><a class="nav-link" href="/login.html">כניסה</a></li>
-          <li class="nav-item"><a class="nav-link" href="/register.html">הרשמה</a></li>
-        </ul>
       </div>
     </div>
   </nav>
@@ -36,17 +33,38 @@
     <!-- אזור הנגן + כפתורי שליטה -->
     <div class="row">
       <div class="col-12">
-        <video id="player" class="w-100" controls playsinline preload="metadata" poster="/img/placeholder.jpg"></video>
+        <div id="playerWrap" class="player-wrap position-relative">
+          <video id="player" class="w-100" controls playsinline preload="metadata" poster="/img/placeholder.jpg"></video>
+          <div id="centerControls" class="center-controls" aria-hidden="true">
+            <button type="button" class="ctrl-btn" id="btnBack10"    aria-label="10 שניות אחורה">⏪</button>
+            <button type="button" class="ctrl-btn" id="btnRestart"   aria-label="התחלה מחדש">↺</button>
+            <button type="button" class="ctrl-btn" id="btnPlayPause" aria-label="ניגון / עצירה">⏯</button>
+            <button type="button" class="ctrl-btn" id="btnForward10" aria-label="10 שניות קדימה">⏩</button>
+          </div>
+          <button type="button" id="btnFullscreen" class="fs-btn" aria-label="מסך מלא">⛶</button>
+          <div id="seekToast" class="seek-toast" aria-hidden="true"></div>
 
-        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div id="endScreen" class="end-screen d-none">
+            <div class="end-screen-inner">
+              <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                <button type="button" class="btn btn-primary" id="btnEndNext">פרק הבא ▶</button>
+                <button type="button" class="btn btn-outline-light" id="btnEndReplay">צפייה מההתחלה ↺</button>
+              </div>
+            </div>
+          </div>
+         </div>
+      
+         <div class="d-flex justify-content-between align-items-center mt-2">
           <div>
             <div id="titleName" class="fw-bold"></div>
             <div id="titleMeta" class="small text-secondary"></div>
+             <!-- כאן יוצגו השחקנים -->
+            <div id="titleActors" class="mt-1 small"></div>
+            <div id="titleDesc" class="mt-2 text-light small d-none"></div>
           </div>
-          <div class="btn-group btn-group-sm" role="group" aria-label="Player controls">
-            <button type="button" class="btn btn-outline-light" id="btnBack10">⏪ 10- שנ'</button>
-            <button type="button" class="btn btn-outline-light" id="btnForward10">10+ שנ' ⏩</button>
-            <button type="button" class="btn btn-outline-light d-none" id="btnNextEp">פרק הבא ▶</button>
+          
+          <div class="btn-group btn-group-sm" role="group" >
+             <button type="button" class="btn btn-outline-light d-none" id="btnNextEp">פרק הבא ▶</button>
           </div>
         </div>
       </div>
@@ -76,18 +94,76 @@
     }
 
     // טעינת כותרת סרטון ורשימת פרקים
-    (async function () {
+   (async function () {
       const qs = new URLSearchParams(location.search);
       const id = qs.get('id');
-      if (!id) {
-        alert('חסר מזהה כותר');
-        location.href = '/app';
-        return;
+      if (!id) { alert("חסר מזהה כותרת"); location.href = "/app"; return; }
+
+      const wrap = document.getElementById('playerWrap');
+      const videoEl = document.getElementById('player');
+      window.videoEl = videoEl;
+
+      const centerControls = document.getElementById('centerControls');
+      const btnBack10 = document.getElementById('btnBack10');
+      const btnPlayPause = document.getElementById('btnPlayPause');
+      const btnForward10 = document.getElementById('btnForward10');
+      const btnRestart = document.getElementById('btnRestart');
+      const btnFullscreen = document.getElementById('btnFullscreen');
+
+      let centerControlsTimer = null;
+
+      function showCenterControls() {
+        centerControls.classList.add("show");
+        clearTimeout(centerControlsTimer);
+        centerControlsTimer = setTimeout(() => centerControls.classList.remove("show"), 2000);
       }
 
-      let currentTitle = null;
-      const videoEl = document.getElementById('player');
+      wrap.addEventListener("mousemove", (e) => {
+        const r = wrap.getBoundingClientRect();
+        const nearBottom = (e.clientY - r.top) > (r.height - 80);
+        wrap.classList.toggle("controls-hover", nearBottom);
+        showCenterControls();
+      });
 
+      wrap.addEventListener("mouseleave", () => {
+        centerControls.classList.remove("show");
+      });
+
+      btnBack10.addEventListener("click", e => { e.stopPropagation(); seekBy(-10); showCenterControls(); });
+      btnForward10.addEventListener("click", e => { e.stopPropagation(); seekBy(+10); showCenterControls(); });
+      btnPlayPause.addEventListener("click", e => {
+        e.stopPropagation();
+        videoEl.paused ? videoEl.play() : videoEl.pause();
+        showCenterControls();
+      });
+
+      if (btnRestart) {
+        btnRestart.addEventListener("click", e => {
+          e.stopPropagation();
+          try {
+            videoEl.currentTime = 0;
+            videoEl.play();
+          } catch (err) {}
+          showCenterControls();
+        });
+      }
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          wrap.requestFullscreen?.();
+        } else {
+          document.exitFullscreen?.();
+        }
+      }
+
+      btnFullscreen.addEventListener("click", e => {
+        e.stopPropagation();
+        toggleFullscreen();
+      });
+      
+      document.addEventListener("fullscreenchange", () => {
+        const isFS = document.fullscreenElement === wrap;
+        btnFullscreen.textContent = isFS ? "🡼" : "⛶";
+      });
       try {
         const r = await fetch('/api/titles/' + encodeURIComponent(id), {
           credentials: 'same-origin',
@@ -100,16 +176,62 @@
         currentTitle = t;
         
         document.getElementById('titleName').textContent = t.name || '';
+        
         const metaParts = [];
         if (t.year) metaParts.push(t.year);
         if (Array.isArray(t.genres) && t.genres.length) {
           metaParts.push(t.genres.join(', '));
         }
         document.getElementById('titleMeta').textContent = metaParts.join(' • ');
+        
+         const descEl = document.getElementById("titleDesc");
+        if (t.description?.trim()) {
+          descEl.textContent = t.description;
+          descEl.classList.remove("d-none");
+        }
+        // --- שחקנים ראשיים: בונה קישור אוטומטי לויקיפדיה ---
+        (function renderActors() {
+          const actorsEl = document.getElementById("titleActors");
+          if (!actorsEl) return;
 
+          const raw = Array.isArray(t.actors) ? t.actors : [];
+          // תומך גם במבנה של שמות בלבד וגם באובייקטים
+          const actors = raw.map(a => {
+            if (typeof a === "string") {
+              return { name: a, wikiUrl: "" };
+            }
+            if (a && typeof a === "object") {
+              return {
+                name: a.name || "",
+                wikiUrl: a.wikiUrl || a.url || ""
+              };
+            }
+            return null;
+          }).filter(a => a && a.name);
+
+          if (!actors.length) {
+            actorsEl.textContent = "";
+            return;
+          }
+
+          const items = actors.map(a => {
+            const name = a.name;
+            // אם אין wikiUrl – נבנה קישור אוטומטי
+            let url = a.wikiUrl;
+            if (!url || !/^https?:\/\//i.test(url)) {
+              const slug = encodeURIComponent(name.replace(/\s+/g, "_"));
+              url = "https://he.wikipedia.org/wiki/" + slug;
+            }
+            const safeName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `<a href="${url}" target="_blank" rel="noopener" class="link-light text-decoration-underline me-1">${safeName}</a>`;
+          });
+
+          actorsEl.innerHTML = "שחקנים ראשיים: " + items.join(" · ");
+        })();
+        // --- סוף שחקנים ראשיים ---
         const url = t.videoPath || (t.videoFileId ? ('/media/' + t.videoFileId) : '');
         if (!url) {
-          alert('אין קובץ וידאו משויך לכותרת');
+          alert('אין  וידאו ');
           return;
         }
 
@@ -123,27 +245,12 @@
           } catch (e) {}
         });
 
-        // כפתורי 10 שניות קדימה/אחורה
-        document.getElementById('btnBack10').addEventListener('click', () => {
-          if (!videoEl) return;
-          try {
-            videoEl.currentTime = Math.max(0, (videoEl.currentTime || 0) - 10);
-          } catch (e) {}
-        });
-        document.getElementById('btnForward10').addEventListener('click', () => {
-          if (!videoEl) return;
-          try {
-            const dur = Number.isFinite(videoEl.duration) ? videoEl.duration : (videoEl.currentTime || 0) + 10;
-            videoEl.currentTime = Math.min(dur, (videoEl.currentTime || 0) + 10);
-          } catch (e) {}
-        });
-
         // טעינת רשימת פרקים אם זה סדרה
-        await loadEpisodesForSeries(currentTitle);
+        await loadEpisodesForSeries(t);
 
       } catch (e) {
         console.error(e);
-        alert('שגיאה בטעינת הכותרת לצפייה');
+        alert('שגיאה בטעינת הכותרת');
         location.href = '/app';
       }
     })();
@@ -187,7 +294,7 @@
 
         if (!episodes.length) return;
 
-        // 2) ממפים מספר פרק מתוך השם (המספר הראשון ב-string)
+        // 
         episodes = episodes.map(ep => {
           const m = String(ep.name || '').match(/(\d+)/);
           const epNum = m ? parseInt(m[1], 10) || 0 : 0;
@@ -298,8 +405,7 @@
       }
     }
   </script>
-
-  <!-- חשוב: watch.js שמבצע saveProgress -->
+        
   <script src="/js/watch.js?v=3"></script>
 </body>
 </html>
